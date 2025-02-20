@@ -1,0 +1,159 @@
+body {
+    font-family: Arial, sans-serif;
+    background: url("background.png") no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Sayfanın tamamını kaplaması için */
+}
+
+h1 {
+    margin: 20px;
+    font-size: 2.5vw;
+    text-align: center;
+}
+
+#puzzle {
+    position: relative;
+    width: 90vw;
+    max-width: 600px;
+    height: 60vh;
+    max-height: 400px;
+    margin-bottom: 30px;
+    border: 5px solid rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6);
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+.cell {
+    position: absolute;
+    width: 8vw;
+    max-width: 50px;
+    height: 8vw;
+    max-height: 50px;
+    border: 2px solid rgb(46, 66, 39);
+    background: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5vw;
+    text-transform: uppercase;
+    color: black;
+    box-sizing: border-box;
+}
+
+.hidden {
+    color: transparent;
+}
+
+#letter-container {
+    position: relative;
+    width: 50vw;
+    max-width: 300px;
+    height: 50vw;
+    max-height: 300px;
+    border: 2px solid #999;
+    border-radius: 50%;
+    background: url("background.png") no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.letter {
+    position: absolute;
+    width: 10vw;
+    max-width: 40px;
+    height: 10vw;
+    max-height: 40px;
+    background: #f39c12;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s;
+    font-size: 1.8vw;
+}
+
+.letter:hover {
+    transform: scale(1.1);
+}
+
+.letter.selected {
+    background: #d35400;
+}
+
+.line {
+    position: absolute;
+    height: 5px;
+    background-color: purple;
+    transform-origin: left center;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 4vw;
+    }
+    
+    #puzzle {
+        width: 95vw;
+        height: 50vh;
+    }
+    
+    .cell {
+        width: 10vw;
+        height: 10vw;
+        font-size: 2vw;
+    }
+    
+    #letter-container {
+        width: 60vw;
+        height: 60vw;
+    }
+    
+    .letter {
+        width: 12vw;
+        height: 12vw;
+        font-size: 2.5vw;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 5vw;
+    }
+    
+    #puzzle {
+        width: 100vw;
+        height: 40vh;
+    }
+    
+    .cell {
+        width: 12vw;
+        height: 12vw;
+        font-size: 3vw;
+    }
+    
+    #letter-container {
+        width: 70vw;
+        height: 70vw;
+    }
+    
+    .letter {
+        width: 15vw;
+        height: 15vw;
+        font-size: 3.5vw;
+    }
+}
