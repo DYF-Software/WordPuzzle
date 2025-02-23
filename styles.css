@@ -1,64 +1,75 @@
-body {
+/* 🌟 GENEL STİLLEME */
+html, body {
     font-family: Arial, sans-serif;
     background: url("background.png") no-repeat center center fixed;
     background-size: cover;
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Ana container: tam sayfa kullanımı */
+  .game-main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh; /* Sayfanın tamamını kaplaması için */
-}
-
-h1 {
-    margin: 20px;
+    justify-content: flex-start; /* Yukarıdan başlayacak */
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  /* Başlık */
+  h1 {
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-size: 2.5vw;
     text-align: center;
-}
-
-#puzzle {
+    color: #333;
+  }
+  
+  /* Puzzle alanı */
+  #puzzle {
     position: relative;
-    width: 90vw;
-    max-width: 600px;
-    height: 60vh;
-    max-height: 400px;
+    width: 90vw;       /* Genişlik: ekranın %90’ı */
+    max-width: 600px;  /* En fazla 600px */
+    height: 60vh;      /* Yükseklik: ekranın %60’ı */
+    max-height: 400px; /* En fazla 400px */
     margin-bottom: 30px;
     border: 5px solid rgba(0, 0, 0, 0.8);
     background: rgba(255, 255, 255, 0.2);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6);
     box-sizing: border-box;
     border-radius: 10px;
-}
-
-.cell {
+  }
+  
+  /* Puzzle hücreleri */
+  .cell {
     position: absolute;
-    width: 8vw;
-    max-width: 50px;
-    height: 8vw;
-    max-height: 50px;
+    /* Genişlik, yükseklik, font boyutu JS'de ölçeklenecek */
+    width: 50px;
+    height: 50px;
     border: 2px solid rgb(46, 66, 39);
     background: rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.5vw;
+    font-size: 18px;
     text-transform: uppercase;
     color: black;
     box-sizing: border-box;
-}
-
-.hidden {
+  }
+  
+  .cell.hidden {
     color: transparent;
-}
-
-#letter-container {
-    position: relative;
-    width: 50vw;
-    max-width: 300px;
-    height: 50vw;
-    max-height: 300px;
+  }
+  
+  /* Harf çemberi (alttaki seçim alanı) */
+  #letter-container {
+    position: absolute;
+    /* Genişlik, yükseklik, konum JS'de belirlenecek */
     border: 2px solid #999;
     border-radius: 50%;
     background: url("background.png") no-repeat center center;
@@ -66,14 +77,13 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.letter {
-    position: absolute;
-    width: 10vw;
-    max-width: 40px;
-    height: 10vw;
-    max-height: 40px;
+    width: 300px;
+    height: 300px;
+  }
+  
+  /* Harfler (çemberin içindeki) */
+  .letter {
+    position: absolute; 
     background: #f39c12;
     border-radius: 50%;
     color: #fff;
@@ -84,76 +94,24 @@ h1 {
     cursor: pointer;
     user-select: none;
     transition: transform 0.2s;
-    font-size: 1.8vw;
-}
-
-.letter:hover {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .letter:hover {
     transform: scale(1.1);
-}
-
-.letter.selected {
+  }
+  
+  .letter.selected {
     background: #d35400;
-}
-
-.line {
+  }
+  
+  /* Çizgiler */
+  #line-container .line {
     position: absolute;
     height: 5px;
     background-color: purple;
     transform-origin: left center;
-}
-
-@media (max-width: 768px) {
-    h1 {
-        font-size: 4vw;
-    }
-    
-    #puzzle {
-        width: 95vw;
-        height: 50vh;
-    }
-    
-    .cell {
-        width: 10vw;
-        height: 10vw;
-        font-size: 2vw;
-    }
-    
-    #letter-container {
-        width: 60vw;
-        height: 60vw;
-    }
-    
-    .letter {
-        width: 12vw;
-        height: 12vw;
-        font-size: 2.5vw;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 5vw;
-    }
-    
-    #puzzle {
-        width: 100vw;
-        height: 40vh;
-    }
-    
-    .cell {
-        width: 12vw;
-        height: 12vw;
-        font-size: 3vw;
-    }
-    
-    #letter-container {
-        width: 70vw;
-        height: 70vw;
-    }
-    
-    .letter {
-        width: 15vw;
-        height: 15vw;
-        font-size: 3.5vw;
-    }
-}
+  }
+  

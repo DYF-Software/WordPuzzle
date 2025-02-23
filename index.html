@@ -2,18 +2,22 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kelime Oyunu</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Kelime Oyunu</h1>
+  <div class="game-main">
+    <h1>Kelime Oyunu</h1>
+    
+    <!-- Puzzle alanı -->
+    <div id="puzzle"></div>
 
-  <!-- Puzzle alanı -->
-  <div id="puzzle"></div>
-
-  <!-- Harf çemberi (altta) -->
-  <div id="letter-container"></div>
-  <div id="line-container"></div>
+    <!-- Harf çemberi (altta) -->
+    <div id="letter-container">
+      <div id="line-container"></div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
