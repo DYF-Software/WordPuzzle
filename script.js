@@ -170,15 +170,16 @@ function updateResponsiveLayout() {
   const puzzleScale = globalScale * puzzleMultiplier;
   const letterScale = globalScale * letterMultiplier;
 
-  // Yeni puzzle container boyutlarını belirle
+  // Yeni puzzle container boyutlarını belirle (container'ın overflow'unu gizleyerek hücreler dışarı taşmasın)
   const newPuzzleWidth = refPuzzleWidth * puzzleScale;
   const newPuzzleHeight = refPuzzleHeight * puzzleScale;
-  puzzleContainer.style.width  = newPuzzleWidth + "px";
+  puzzleContainer.style.width  = newPuzzleWidth-20 + "px";
   puzzleContainer.style.height = newPuzzleHeight + "px";
+  puzzleContainer.style.overflow = "hidden";
 
   // --- Puzzle hücrelerinin grup bounding box'unu hesapla ---
-  const cellWidth = 50;  // referans hücre boyutu (width)
-  const cellHeight = 50; // referans hücre boyutu (height)
+  const cellWidth = 50;  // referans hücre boyutu
+  const cellHeight = 50; // referans hücre boyutu
   const xs = puzzleCells.map(cell => cell.x);
   const ys = puzzleCells.map(cell => cell.y);
   const minX = Math.min(...xs);
@@ -187,17 +188,21 @@ function updateResponsiveLayout() {
   const maxY = Math.max(...ys) + cellHeight;
   const groupWidth  = maxX - minX;
   const groupHeight = maxY - minY;
-  // Puzzle container (referans) boyutlarına göre ortalama ofsetleri hesapla
-  const offsetX = (refPuzzleWidth - groupWidth) / 2 - minX;
-  const offsetY = (refPuzzleHeight - groupHeight) / 2 - minY;
 
-  // --- Puzzle hücrelerinin konum ve boyutlarını güncelle (merkezi yeniden ayarla) ---
+  // --- Gerçek (scaled) container boyutları kullanılarak ofset hesapla ---
+  // Hücre grubunun genişliği ve yüksekliği de puzzleScale ile ölçeklenecek
+  const scaledGroupWidth = groupWidth * puzzleScale;
+  const scaledGroupHeight = groupHeight * puzzleScale;
+  // Hücre grubunu container içinde ortalamak için ofset (doğrudan piksel cinsinden)
+  const offsetX = (newPuzzleWidth - scaledGroupWidth) / 2 - (minX * puzzleScale);
+  const offsetY = (newPuzzleHeight - scaledGroupHeight) / 2 - (minY * puzzleScale);
+
+  // --- Puzzle hücrelerinin konum ve boyutlarını güncelle (ofset eklenmiş) ---
   puzzleCells.forEach((cell, index) => {
     const div = puzzleContainer.querySelector(`.cell[data-index='${index}']`);
     if (div) {
-      // Orijinal koordinata, hesaplanan offset'i ekleyip, puzzleScale ile çarpıyoruz
-      div.style.left = ((cell.x + offsetX) * puzzleScale) + "px";
-      div.style.top  = ((cell.y + offsetY) * puzzleScale) + "px";
+      div.style.left = (cell.x * puzzleScale + offsetX) + "px";
+      div.style.top  = (cell.y * puzzleScale + offsetY) + "px";
       const newSize = cellWidth * puzzleScale; 
       div.style.width  = newSize + "px";
       div.style.height = newSize + "px";
@@ -240,6 +245,7 @@ function updateResponsiveLayout() {
     }
   });
 }
+
 
 
 

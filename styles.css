@@ -1,5 +1,7 @@
 /* 🌟 GENEL STİLLEME */
+
 html, body {
+  
     font-family: Arial, sans-serif;
     background: url("background.png") no-repeat center center fixed;
     background-size: cover;
@@ -31,11 +33,10 @@ html, body {
   
   /* Puzzle alanı */
   #puzzle {
+    top: 15px;
     position: relative;
     width: 90vw;       /* Genişlik: ekranın %90’ı */
-    max-width: 600px;  /* En fazla 600px */
     height: 60vh;      /* Yükseklik: ekranın %60’ı */
-    max-height: 400px; /* En fazla 400px */
     margin-bottom: 30px;
     border: 5px solid rgba(0, 0, 0, 0.8);
     background: rgba(255, 255, 255, 0.2);
