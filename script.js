@@ -29,20 +29,21 @@ const puzzleWords = [
   { word: "ALE",  cellIndexes: [11, 12, 13] }
 ];
 
+const letters = ["T", "A", "L", "E"];
+
 /* -------------------------------------------
    2) DOM Elemanlarını Oluşturma
 ------------------------------------------- */
 const puzzleContainer = document.getElementById("puzzle");
 const letterContainer  = document.getElementById("letter-container");
 const lineContainer    = document.getElementById("line-container");
-const letters = ["T", "A", "L", "E"];
 
 /* Puzzle hücrelerini DOM’a ekle */
 puzzleCells.forEach((cell, index) => {
   const div = document.createElement("div");
   div.classList.add("cell", "hidden"); // Başlangıçta gizli
-  div.style.left = cell.x + "px";  // Referans konumlar (JS ölçekleyecek)
-  div.style.top  = cell.y + "px";
+  div.style.left = cell.x + "px";
+  div.style.top = cell.y + "px";
   div.setAttribute("data-index", index);
   div.setAttribute("data-letter", cell.letter);
   div.textContent = cell.letter;
@@ -67,7 +68,7 @@ let selectedLetterDivs = [];
 const lines = [];
 
 function selectLetter(target) {
-  if (!target.classList.contains("letter")) return;
+  if (!target || !target.classList.contains("letter")) return;
   if (!selectedLetterDivs.includes(target)) {
     selectedLetterDivs.push(target);
     selectedLetters.push(target.getAttribute("data-letter"));
@@ -82,8 +83,8 @@ function selectLetter(target) {
 function drawLine(startDiv, endDiv) {
   const startX = startDiv.offsetLeft + startDiv.offsetWidth / 2;
   const startY = startDiv.offsetTop + startDiv.offsetHeight / 2;
-  const endX   = endDiv.offsetLeft + endDiv.offsetWidth / 2;
-  const endY   = endDiv.offsetTop + endDiv.offsetHeight / 2;
+  const endX = endDiv.offsetLeft + endDiv.offsetWidth / 2;
+  const endY = endDiv.offsetTop + endDiv.offsetHeight / 2;
 
   const dx = endX - startX;
   const dy = endY - startY;
@@ -93,8 +94,8 @@ function drawLine(startDiv, endDiv) {
   const line = document.createElement("div");
   line.classList.add("line");
   line.style.width = `${distance}px`;
-  line.style.left  = `${startX}px`;
-  line.style.top   = `${startY}px`;
+  line.style.left = `${startX}px`;
+  line.style.top = `${startY}px`;
   line.style.transform = `rotate(${angle}deg)`;
   lineContainer.appendChild(line);
   lines.push(line);
@@ -118,7 +119,10 @@ function revealWord(wordObj) {
   });
 }
 
-/* Fare olayları */
+/* -------------------------------------------
+   4) Olaylar: Mouse ve Touch
+------------------------------------------- */
+/* Mouse Olayları */
 letterContainer.addEventListener("mousedown", e => {
   isMouseDown = true;
   selectLetter(e.target);
@@ -131,7 +135,6 @@ document.addEventListener("mouseup", () => {
     isMouseDown = false;
     const formedWord = selectedLetters.join("");
     console.log("Seçilen Kelime:", formedWord);
-
     const foundWordObj = puzzleWords.find(obj => obj.word === formedWord);
     if (foundWordObj) {
       revealWord(foundWordObj);
@@ -140,8 +143,43 @@ document.addEventListener("mouseup", () => {
   }
 });
 
+/* Dokunmatik (Touch) Olayları - Mobil cihazlar için */
+letterContainer.addEventListener("touchstart", e => {
+  e.preventDefault();
+  isMouseDown = true;
+  const touch = e.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  selectLetter(target);
+});
+letterContainer.addEventListener("touchmove", e => {
+  e.preventDefault();
+  if (isMouseDown) {
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    selectLetter(target);
+  }
+});
+document.addEventListener("touchend", () => {
+  if (isMouseDown) {
+    isMouseDown = false;
+    const formedWord = selectedLetters.join("");
+    console.log("Seçilen Kelime:", formedWord);
+    const foundWordObj = puzzleWords.find(obj => obj.word === formedWord);
+    if (foundWordObj) {
+      revealWord(foundWordObj);
+    }
+    resetSelection();
+  }
+});
+document.addEventListener("touchcancel", () => {
+  if (isMouseDown) {
+    isMouseDown = false;
+    resetSelection();
+  }
+});
+
 /* -------------------------------------------
-   4) Responsive Ölçeklendirme (JS)
+   5) Responsive Ölçeklendirme (JS)
 ------------------------------------------- */
 function updateResponsiveLayout() {
   // Scrollbar gizleme
@@ -152,25 +190,25 @@ function updateResponsiveLayout() {
   const availHeight = window.innerHeight;
 
   // Referans değerler (tasarım temel ölçüleri)
-  const refPuzzleWidth  = 400;   // Puzzle için referans genişlik
-  const refPuzzleHeight = 300;   // Puzzle için referans yükseklik
-  const refLetterSize   = 300;   // Harf çemberi için referans ölçü
-  const refH1Height     = 50;    // Başlık için referans yükseklik
-  const refMargin       = 20;    // Puzzle ile harf çemberi arasındaki boşluk
+  const refPuzzleWidth  = 400;
+  const refPuzzleHeight = 300;
+  const refLetterSize   = 300;
+  const refH1Height     = 50;
+  const refMargin       = 20;
 
-  // Ek multiplier'lar: puzzle container'ı büyütmek, letter container'ı küçültmek için
-  const puzzleMultiplier = 1.2; // Puzzle %20 daha büyük
-  const letterMultiplier = 0.8; // Letter container %20 daha küçük
+  // Ek multiplier'lar
+  const puzzleMultiplier = 1.2;
+  const letterMultiplier = 0.8;
 
-  // Toplam referans yükseklik: Başlık + (Puzzle * multiplier) + Margin + (Letter Container * multiplier)
+  // Toplam referans yükseklik
   const totalRefHeight = refH1Height + (refPuzzleHeight * puzzleMultiplier) + refMargin + (refLetterSize * letterMultiplier);
 
-  // Global ölçek: Ekranın hem genişlik hem de yüksekliğine göre hesapla
+  // Global ölçek hesapla
   const globalScale = Math.min(availHeight / totalRefHeight, availWidth / (refPuzzleWidth * puzzleMultiplier));
   const puzzleScale = globalScale * puzzleMultiplier;
   const letterScale = globalScale * letterMultiplier;
 
-  // Yeni puzzle container boyutlarını belirle
+  // Yeni puzzle container boyutları
   const newPuzzleWidth = refPuzzleWidth * puzzleScale;
   const newPuzzleHeight = refPuzzleHeight * puzzleScale;
   puzzleContainer.style.width  = (newPuzzleWidth - 20) + "px";
@@ -189,17 +227,17 @@ function updateResponsiveLayout() {
   const groupWidth  = maxX - minX;
   const groupHeight = maxY - minY;
 
-  // Gerçek (scaled) container boyutları kullanılarak ofset hesapla
+  // Scaled group ölçüleri ve ofset 
   const scaledGroupWidth = groupWidth * puzzleScale;
   const scaledGroupHeight = groupHeight * puzzleScale;
   const offsetX = (newPuzzleWidth - scaledGroupWidth) / 2 - (minX * puzzleScale);
   const offsetY = (newPuzzleHeight - scaledGroupHeight) / 2 - (minY * puzzleScale);
 
-  // Puzzle hücrelerini güncelle
+  // Puzzle hücrelerinin konum ve boyutlarını güncelle
   puzzleCells.forEach((cell, index) => {
     const div = puzzleContainer.querySelector(`.cell[data-index='${index}']`);
     if (div) {
-      div.style.left = (cell.x * puzzleScale + offsetX) + "px";
+      div.style.left = (cell.x * puzzleScale + offsetX)-17 + "px";
       div.style.top  = (cell.y * puzzleScale + offsetY) + "px";
       const newSize = cellWidth * puzzleScale;
       div.style.width  = newSize + "px";
@@ -208,20 +246,19 @@ function updateResponsiveLayout() {
     }
   });
 
-  // Harf çemberinin (letter container) boyutunu ayarla
+  // Harf çemberinin boyutunu ayarla
   const newLetterSize = refLetterSize * letterScale;
   letterContainer.style.width  = newLetterSize + "px";
   letterContainer.style.height = newLetterSize + "px";
 
-  // Puzzle container ve harf çemberi arasındaki margin
+  // Puzzle container ile harf çemberi arasındaki margin
   const margin = refMargin * puzzleScale;
 
   // Toplam içerik yüksekliğini hesapla (başlık hariç: puzzle + margin + letter container)
   const totalContentHeight = newPuzzleHeight + margin + newLetterSize;
-  // İçeriği ekranın ortasına yerleştirmek için dikey offset hesapla
   const verticalOffset = (availHeight - totalContentHeight) / 2;
 
-  // Puzzle container'ı dikey olarak konumlandır (CSS'deki top:15px kuralını geçersiz kılmak için)
+  // Puzzle container'ı dikey olarak konumlandır
   puzzleContainer.style.position = "absolute";
   puzzleContainer.style.top = verticalOffset + "px";
 
@@ -252,13 +289,8 @@ function updateResponsiveLayout() {
   });
 }
 
-
-
-
-
-
 /* -------------------------------------------
-   5) Sayfa Yüklendiğinde ve Yeniden Boyutlandığında
+   6) Sayfa Yüklendiğinde ve Yeniden Boyutlandığında
 ------------------------------------------- */
 window.addEventListener("load", updateResponsiveLayout);
 window.addEventListener("resize", updateResponsiveLayout);
