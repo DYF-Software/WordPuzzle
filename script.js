@@ -151,71 +151,98 @@ function updateResponsiveLayout() {
   const availWidth  = window.innerWidth;
   const availHeight = window.innerHeight;
 
-  // Referans değerler (tasarımımızın temel ölçüleri)
-  const refPuzzleWidth  = 400;  // Puzzle için referans genişlik
-  const refPuzzleHeight = 300;  // Puzzle için referans yükseklik
-  const refLetterSize   = 300;  // Harf çemberi için referans ölçü (width = height)
-  const refH1Height     = 50;   // Başlık için yaklaşık referans yükseklik
-  const refMargin       = 20;   // Puzzle ile harf çemberi arasındaki boşluk
+  // Referans değerler (tasarım temel ölçüleri)
+  const refPuzzleWidth  = 400;   // Puzzle için referans genişlik
+  const refPuzzleHeight = 300;   // Puzzle için referans yükseklik
+  const refLetterSize   = 300;   // Harf çemberi için referans ölçü
+  const refH1Height     = 50;    // Başlık için referans yükseklik
+  const refMargin       = 20;    // Puzzle ile harf çemberi arasındaki boşluk
 
-  // Toplam referans yükseklik: Başlık + Puzzle + Margin + Harf Çemberi
-  const totalRefHeight = refH1Height + refPuzzleHeight + refMargin + refLetterSize;
+  // Ek multiplier'lar: puzzle container'ı büyütmek, letter container'ı küçültmek için
+  const puzzleMultiplier = 1.2; // Puzzle %20 daha büyük
+  const letterMultiplier = 0.8; // Letter container %20 daha küçük
 
-  // Global ölçek: Ekran yüksekliği veya genişliği referanslarına göre
-  const globalScale = Math.min(1, availHeight / totalRefHeight, availWidth / refPuzzleWidth);
+  // Toplam referans yükseklik: Başlık + (Puzzle * multiplier) + Margin + (Letter Container * multiplier)
+  const totalRefHeight = refH1Height + (refPuzzleHeight * puzzleMultiplier) + refMargin + (refLetterSize * letterMultiplier);
 
-  // Puzzle container'ın mevcut ölçülerini al
-  const puzzleRect   = puzzleContainer.getBoundingClientRect();
-  const puzzleWidth  = puzzleRect.width;
-  const puzzleHeight = puzzleRect.height;
+  // Global ölçek: Ekranın hem genişlik hem de yüksekliğine göre hesapla
+  const globalScale = Math.min(availHeight / totalRefHeight, availWidth / (refPuzzleWidth * puzzleMultiplier));
+  const puzzleScale = globalScale * puzzleMultiplier;
+  const letterScale = globalScale * letterMultiplier;
 
-  // Puzzle hücrelerinin ölçeklenmesi: Referans 400x300'e göre
-  const scalePuzzle = Math.min(puzzleWidth / refPuzzleWidth, puzzleHeight / refPuzzleHeight);
-  const scale = scalePuzzle * globalScale;
+  // Yeni puzzle container boyutlarını belirle
+  const newPuzzleWidth = refPuzzleWidth * puzzleScale;
+  const newPuzzleHeight = refPuzzleHeight * puzzleScale;
+  puzzleContainer.style.width  = newPuzzleWidth + "px";
+  puzzleContainer.style.height = newPuzzleHeight + "px";
 
-  // Puzzle hücrelerini güncelle
+  // --- Puzzle hücrelerinin grup bounding box'unu hesapla ---
+  const cellWidth = 50;  // referans hücre boyutu (width)
+  const cellHeight = 50; // referans hücre boyutu (height)
+  const xs = puzzleCells.map(cell => cell.x);
+  const ys = puzzleCells.map(cell => cell.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs) + cellWidth; // hücrenin tamamını kapsaması için
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys) + cellHeight;
+  const groupWidth  = maxX - minX;
+  const groupHeight = maxY - minY;
+  // Puzzle container (referans) boyutlarına göre ortalama ofsetleri hesapla
+  const offsetX = (refPuzzleWidth - groupWidth) / 2 - minX;
+  const offsetY = (refPuzzleHeight - groupHeight) / 2 - minY;
+
+  // --- Puzzle hücrelerinin konum ve boyutlarını güncelle (merkezi yeniden ayarla) ---
   puzzleCells.forEach((cell, index) => {
     const div = puzzleContainer.querySelector(`.cell[data-index='${index}']`);
     if (div) {
-      div.style.left = (cell.x * scale) + "px";
-      div.style.top  = (cell.y * scale) + "px";
-      const newSize = 50 * scale; // Orijinal 50px
+      // Orijinal koordinata, hesaplanan offset'i ekleyip, puzzleScale ile çarpıyoruz
+      div.style.left = ((cell.x + offsetX) * puzzleScale) + "px";
+      div.style.top  = ((cell.y + offsetY) * puzzleScale) + "px";
+      const newSize = cellWidth * puzzleScale; 
       div.style.width  = newSize + "px";
       div.style.height = newSize + "px";
-      div.style.fontSize = (18 * scale) + "px";
+      div.style.fontSize = (18 * puzzleScale) + "px";
     }
   });
 
-  // Harf çemberinin boyutunu ve konumunu ayarla
-  const letterBaseSize = refLetterSize; // 300px
-  const letterSize = letterBaseSize * scale;
-  letterContainer.style.width  = letterSize + "px";
-  letterContainer.style.height = letterSize + "px";
+  // --- Harf çemberinin (letter container) boyutunu ayarla (letter container daha küçük) ---
+  const newLetterSize = refLetterSize * letterScale;
+  letterContainer.style.width  = newLetterSize + "px";
+  letterContainer.style.height = newLetterSize + "px";
 
-  // Puzzle'ın altına, arada scaled margin olacak şekilde konumlandır
-  const margin = refMargin * scale;
+  // Puzzle container'ın konumunu al (ekran üzerinde yerleştirme için)
+  const puzzleRect = puzzleContainer.getBoundingClientRect();
+  const margin = refMargin * puzzleScale; // margin puzzle ölçeğine göre
+
+  // Harf çemberini puzzle'ın altına, ortalanmış ve arada margin olacak şekilde yerleştir
   letterContainer.style.position = "absolute";
-  letterContainer.style.left = (puzzleRect.left + (puzzleWidth - letterSize) / 2) + "px";
+  letterContainer.style.left = (puzzleRect.left + (puzzleRect.width - newLetterSize) / 2) + "px";
   letterContainer.style.top  = (puzzleRect.bottom + margin) + "px";
 
-  // Harf çemberi içindeki harfleri ölçekle (referans: merkez 150,150; yarıçap=100; harf boyutu 40, font=16px)
-  const refCenterX = 150, refCenterY = 150, refRadius = 100;
+  // --- Harf çemberi içindeki harflerin pozisyon ve boyutlarını ölçekle ---
+  // Yeni referans: merkez = letter container'ın yarısı, yarıçap = letter container'ın üçte biri
+  const refCenterX = newLetterSize / 2;
+  const refCenterY = newLetterSize / 2;
+  const refRadius = newLetterSize / 3;
   letters.forEach((letter, i) => {
     const letterDiv = letterContainer.querySelector(`.letter[data-letter='${letter}']`);
     if (letterDiv) {
       const angle = i * ((2 * Math.PI) / letters.length) - Math.PI / 2;
-      // Harflerin orijinal pozisyonu (merkez + yarıçap)
-      const posX = refCenterX + refRadius * Math.cos(angle) - 20;
-      const posY = refCenterY + refRadius * Math.sin(angle) - 20;
-      letterDiv.style.left = (posX * scale) + "px";
-      letterDiv.style.top  = (posY * scale) + "px";
-      const size = 40 * scale;
+      const letterOffset = (40 * letterScale) / 2; // harf boyutunun yarısı
+      const posX = refCenterX + refRadius * Math.cos(angle) - letterOffset;
+      const posY = refCenterY + refRadius * Math.sin(angle) - letterOffset;
+      letterDiv.style.left = posX + "px";
+      letterDiv.style.top  = posY + "px";
+      const size = 40 * letterScale;
       letterDiv.style.width  = size + "px";
       letterDiv.style.height = size + "px";
-      letterDiv.style.fontSize = (16 * scale) + "px";
+      letterDiv.style.fontSize = (16 * letterScale) + "px";
     }
   });
 }
+
+
+
 
 /* -------------------------------------------
    5) Sayfa Yüklendiğinde ve Yeniden Boyutlandığında
