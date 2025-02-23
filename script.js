@@ -294,3 +294,7 @@ function updateResponsiveLayout() {
 ------------------------------------------- */
 window.addEventListener("load", updateResponsiveLayout);
 window.addEventListener("resize", updateResponsiveLayout);
+document.getElementById("start-btn").addEventListener("click", function () {
+  document.getElementById("start-screen").style.display = "none";
+  initGame();
+});

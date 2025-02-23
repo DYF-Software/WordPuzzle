@@ -115,4 +115,39 @@ html, body {
     background-color: purple;
     transform-origin: left center;
   }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .start-container {
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeIn 1s ease;
+  }
   
+  #start-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    background: #5563DE;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  #start-btn:hover {
+    background: #3a49b8;
+  }
