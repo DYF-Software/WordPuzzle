@@ -170,62 +170,68 @@ function updateResponsiveLayout() {
   const puzzleScale = globalScale * puzzleMultiplier;
   const letterScale = globalScale * letterMultiplier;
 
-  // Yeni puzzle container boyutlarını belirle (container'ın overflow'unu gizleyerek hücreler dışarı taşmasın)
+  // Yeni puzzle container boyutlarını belirle
   const newPuzzleWidth = refPuzzleWidth * puzzleScale;
   const newPuzzleHeight = refPuzzleHeight * puzzleScale;
-  puzzleContainer.style.width  = newPuzzleWidth-20 + "px";
+  puzzleContainer.style.width  = (newPuzzleWidth - 20) + "px";
   puzzleContainer.style.height = newPuzzleHeight + "px";
   puzzleContainer.style.overflow = "hidden";
 
-  // --- Puzzle hücrelerinin grup bounding box'unu hesapla ---
-  const cellWidth = 50;  // referans hücre boyutu
-  const cellHeight = 50; // referans hücre boyutu
+  // Puzzle hücrelerinin grup bounding box'unu hesapla
+  const cellWidth = 50;
+  const cellHeight = 50;
   const xs = puzzleCells.map(cell => cell.x);
   const ys = puzzleCells.map(cell => cell.y);
   const minX = Math.min(...xs);
-  const maxX = Math.max(...xs) + cellWidth; // hücrenin tamamını kapsaması için
+  const maxX = Math.max(...xs) + cellWidth;
   const minY = Math.min(...ys);
   const maxY = Math.max(...ys) + cellHeight;
   const groupWidth  = maxX - minX;
   const groupHeight = maxY - minY;
 
-  // --- Gerçek (scaled) container boyutları kullanılarak ofset hesapla ---
-  // Hücre grubunun genişliği ve yüksekliği de puzzleScale ile ölçeklenecek
+  // Gerçek (scaled) container boyutları kullanılarak ofset hesapla
   const scaledGroupWidth = groupWidth * puzzleScale;
   const scaledGroupHeight = groupHeight * puzzleScale;
-  // Hücre grubunu container içinde ortalamak için ofset (doğrudan piksel cinsinden)
   const offsetX = (newPuzzleWidth - scaledGroupWidth) / 2 - (minX * puzzleScale);
   const offsetY = (newPuzzleHeight - scaledGroupHeight) / 2 - (minY * puzzleScale);
 
-  // --- Puzzle hücrelerinin konum ve boyutlarını güncelle (ofset eklenmiş) ---
+  // Puzzle hücrelerini güncelle
   puzzleCells.forEach((cell, index) => {
     const div = puzzleContainer.querySelector(`.cell[data-index='${index}']`);
     if (div) {
       div.style.left = (cell.x * puzzleScale + offsetX) + "px";
       div.style.top  = (cell.y * puzzleScale + offsetY) + "px";
-      const newSize = cellWidth * puzzleScale; 
+      const newSize = cellWidth * puzzleScale;
       div.style.width  = newSize + "px";
       div.style.height = newSize + "px";
       div.style.fontSize = (18 * puzzleScale) + "px";
     }
   });
 
-  // --- Harf çemberinin (letter container) boyutunu ayarla (letter container daha küçük) ---
+  // Harf çemberinin (letter container) boyutunu ayarla
   const newLetterSize = refLetterSize * letterScale;
   letterContainer.style.width  = newLetterSize + "px";
   letterContainer.style.height = newLetterSize + "px";
 
-  // Puzzle container'ın konumunu al (ekran üzerinde yerleştirme için)
-  const puzzleRect = puzzleContainer.getBoundingClientRect();
-  const margin = refMargin * puzzleScale; // margin puzzle ölçeğine göre
+  // Puzzle container ve harf çemberi arasındaki margin
+  const margin = refMargin * puzzleScale;
 
-  // Harf çemberini puzzle'ın altına, ortalanmış ve arada margin olacak şekilde yerleştir
+  // Toplam içerik yüksekliğini hesapla (başlık hariç: puzzle + margin + letter container)
+  const totalContentHeight = newPuzzleHeight + margin + newLetterSize;
+  // İçeriği ekranın ortasına yerleştirmek için dikey offset hesapla
+  const verticalOffset = (availHeight - totalContentHeight) / 2;
+
+  // Puzzle container'ı dikey olarak konumlandır (CSS'deki top:15px kuralını geçersiz kılmak için)
+  puzzleContainer.style.position = "absolute";
+  puzzleContainer.style.top = verticalOffset + "px";
+
+  // Harf çemberini puzzle'ın altına, ortalanmış şekilde yerleştir
+  const puzzleRect = puzzleContainer.getBoundingClientRect();
   letterContainer.style.position = "absolute";
   letterContainer.style.left = (puzzleRect.left + (puzzleRect.width - newLetterSize) / 2) + "px";
-  letterContainer.style.top  = (puzzleRect.bottom + margin) + "px";
+  letterContainer.style.top  = (verticalOffset + newPuzzleHeight + margin) + "px";
 
-  // --- Harf çemberi içindeki harflerin pozisyon ve boyutlarını ölçekle ---
-  // Yeni referans: merkez = letter container'ın yarısı, yarıçap = letter container'ın üçte biri
+  // Harf çemberi içindeki harflerin konum ve boyutlarını ölçekle
   const refCenterX = newLetterSize / 2;
   const refCenterY = newLetterSize / 2;
   const refRadius = newLetterSize / 3;
@@ -233,7 +239,7 @@ function updateResponsiveLayout() {
     const letterDiv = letterContainer.querySelector(`.letter[data-letter='${letter}']`);
     if (letterDiv) {
       const angle = i * ((2 * Math.PI) / letters.length) - Math.PI / 2;
-      const letterOffset = (40 * letterScale) / 2; // harf boyutunun yarısı
+      const letterOffset = (40 * letterScale) / 2;
       const posX = refCenterX + refRadius * Math.cos(angle) - letterOffset;
       const posY = refCenterY + refRadius * Math.sin(angle) - letterOffset;
       letterDiv.style.left = posX + "px";
@@ -245,6 +251,7 @@ function updateResponsiveLayout() {
     }
   });
 }
+
 
 
 
