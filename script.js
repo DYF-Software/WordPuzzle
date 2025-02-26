@@ -117,6 +117,20 @@ function revealWord(wordObj) {
       cell.classList.add("visible");
     }
   });
+  checkIfGameCompleted(); // Her kelime tamamlandığında oyunun bitip bitmediğini kontrol et
+
+}
+function checkIfGameCompleted() {
+  const allRevealed = document.querySelectorAll(".cell.visible").length === puzzleCells.length;
+  if (allRevealed) {
+    setTimeout(showWinScreen, 1000); // 1 saniye gecikmeyle ekranı göster
+  }
+}
+document.getElementById("close-btn").addEventListener("click", function () {
+  document.getElementById("win-screen").style.display = "none";
+});
+function showWinScreen() {
+  document.getElementById("win-screen").style.display = "flex";
 }
 
 /* -------------------------------------------
