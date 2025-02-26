@@ -123,7 +123,7 @@ function revealWord(wordObj) {
 function checkIfGameCompleted() {
   const allRevealed = document.querySelectorAll(".cell.visible").length === puzzleCells.length;
   if (allRevealed) {
-    setTimeout(showWinScreen, 1000); // 1 saniye gecikmeyle ekranı göster
+    setTimeout(showWinScreen, 500); 
   }
 }
 document.getElementById("close-btn").addEventListener("click", function () {
